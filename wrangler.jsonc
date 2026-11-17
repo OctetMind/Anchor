@@ -1,0 +1,12 @@
+// Deploy Anchor to Cloudflare Workers (static hosting — free, unlimited):
+//   1. node build.mjs        (fingerprints assets for max caching → ./dist)
+//   2. npx wrangler login
+//   3. npx wrangler deploy
+// You'll get a URL like https://anchor.<your-subdomain>.workers.dev
+{
+  "name": "anchor",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./dist"
+  }
+}

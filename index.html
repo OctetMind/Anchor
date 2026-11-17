@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#14161a">
+<meta name="description" content="Anchor — a calm, one-shot AI assistant built for AuDHD brains. Bring your own LLM.">
+<title>Anchor · one-shot AI assistant</title>
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a class="skip" href="#composer-input">Skip to typing box</a>
+
+<div id="app">
+  <div id="backdrop" hidden></div>
+
+  <aside id="sidebar" aria-label="Menu, tools and conversations">
+    <div class="side-head">
+      <div class="brand">
+        <svg class="ic ic-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="5.5" r="2.5"/><path d="M12 8v10M8 11h8M4.5 13a7.5 7.5 0 0 0 15 0"/></svg>
+        <span>Anchor</span>
+      </div>
+      <button id="close-sidebar" class="icon-btn" aria-label="Close menu" title="Close menu">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <button id="new-chat" class="btn-primary wide">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+      New chat
+    </button>
+
+    <nav class="tools" aria-label="Quick tools">
+      <h2>Quick tools</h2>
+      <div class="finder-wrap" data-hide="#tool-list">
+        <div class="search-box">
+          <svg class="ic ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input class="tool-finder" type="search" placeholder="What do you need?" aria-label="Find the right tool" autocomplete="off">
+          <button type="button" class="icon-btn icon-btn-sm finder-clear" hidden aria-label="Clear" title="Clear">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div class="finder-results" hidden></div>
+      </div>
+      <div id="tool-list"></div>
+    </nav>
+
+    <nav class="convos" aria-label="Conversations">
+      <h2>Chats</h2>
+      <div class="search-box">
+        <svg class="ic ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="search-input" type="search" placeholder="Search all chats" autocomplete="off" aria-label="Search all chats">
+        <button id="search-clear" class="icon-btn icon-btn-sm" hidden aria-label="Clear search" title="Clear">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div id="convo-list"></div>
+      <div id="search-results" hidden></div>
+    </nav>
+
+    <div class="side-foot">
+      <button id="install-btn" class="btn-ghost wide" hidden>
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M12 7v8M9 12l3 3 3-3"/></svg>
+        Install on this device
+      </button>
+      <button id="open-settings-side" class="btn-ghost wide">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="15" cy="6" r="2.2" fill="currentColor" stroke="none"/><circle cx="8" cy="12" r="2.2" fill="currentColor" stroke="none"/><circle cx="13" cy="18" r="2.2" fill="currentColor" stroke="none"/></svg>
+        Settings
+      </button>
+    </div>
+  </aside>
+
+  <main id="main">
+    <header id="topbar">
+      <button id="open-sidebar" class="icon-btn" aria-label="Open menu" title="Menu">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
+      <div id="chat-title" class="chat-title">New chat</div>
+      <button id="model-pill" class="pill" title="Change AI model">…</button>
+      <button id="theme-toggle" class="icon-btn" aria-label="Switch light/dark theme" title="Theme">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+      </button>
+      <button id="open-settings" class="icon-btn" aria-label="Settings" title="Settings">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="15" cy="6" r="2.2" fill="currentColor" stroke="none"/><circle cx="8" cy="12" r="2.2" fill="currentColor" stroke="none"/><circle cx="13" cy="18" r="2.2" fill="currentColor" stroke="none"/></svg>
+      </button>
+    </header>
+
+    <div id="chat" aria-label="Conversation">
+      <div id="messages"></div>
+
+      <div id="empty" class="empty">
+        <h1>Hello.</h1>
+        <p class="lede">Ask anything and get a complete, structured answer in one go — no back-and-forth, no follow-up questions.</p>
+        <div class="finder-wrap" data-hide="#tool-list-empty">
+          <div class="search-box">
+            <svg class="ic ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <input class="tool-finder" type="search" placeholder="What do you need? e.g. call the dentist about a bill" aria-label="Find the right tool" autocomplete="off">
+            <button type="button" class="icon-btn icon-btn-sm finder-clear" hidden aria-label="Clear" title="Clear">
+              <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </button>
+          </div>
+          <div class="finder-results" hidden></div>
+        </div>
+        <div id="tool-list-empty" class="tool-grid"></div>
+        <p class="dim">Everything stays on this device. Add an API key in <strong>Settings → AI</strong> to begin.</p>
+      </div>
+    </div>
+
+    <div id="composer-wrap">
+      <div class="composer">
+        <textarea id="composer-input" rows="1" placeholder="Ask anything — you'll get the full answer in one go" aria-label="Your message"></textarea>
+        <button id="mic-btn" class="mic-btn" aria-label="Voice input" title="Voice input — tap again when done" aria-pressed="false" hidden>
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v1a7 7 0 0 0 14 0v-1"/><path d="M12 18v4"/></svg>
+        </button>
+        <button id="send-btn" class="send" aria-label="Send message" title="Send" disabled>
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+        </button>
+      </div>
+      <div id="key-hint" class="composer-hint" hidden>
+        <span id="key-hint-text">No API key yet —</span>
+        <button type="button" id="key-hint-btn" class="linklike">open Settings → AI</button>
+        <span id="key-hint-tail"> to add one (takes a minute).</span>
+      </div>
+    </div>
+  </main>
+</div>
+
+<dialog id="settings" aria-labelledby="settings-title">
+  <div class="dlg-head">
+    <h2 id="settings-title">Settings</h2>
+    <span id="save-flash" aria-live="polite">Saved ✓</span>
+    <button id="close-settings" class="icon-btn" aria-label="Close settings" title="Close">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+
+  <div class="tabs" role="tablist" aria-label="Settings sections">
+    <button role="tab" class="tab-btn" data-tab="ai" aria-selected="true">AI</button>
+    <button role="tab" class="tab-btn" data-tab="interface" aria-selected="false">Display</button>
+    <button role="tab" class="tab-btn" data-tab="data" aria-selected="false">Data</button>
+    <button role="tab" class="tab-btn" data-tab="about" aria-selected="false">About</button>
+  </div>
+
+  <div class="tab-body" data-tab-body="ai">
+    <div class="row">
+      <label for="set-provider">Provider</label>
+      <select id="set-provider"></select>
+    </div>
+    <div class="row">
+      <label for="set-base">Base URL</label>
+      <input id="set-base" type="url" autocomplete="off" spellcheck="false" placeholder="https://api.example.com/v1">
+      <p class="hint">Change this only if you use a proxy or your own server.</p>
+    </div>
+    <div class="row" id="key-row">
+      <label for="set-key">API key</label>
+      <div class="key-wrap" id="key-wrap">
+        <input id="set-key" type="password" autocomplete="off" spellcheck="false" placeholder="Paste your key — stays on this device">
+        <button id="key-eye" class="icon-btn" type="button" aria-label="Show or hide key" title="Show/hide">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+      <div id="key-locked" class="key-locked" hidden>
+        <button type="button" id="btn-unlock" class="btn-ghost">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+          Unlock — enter your passphrase
+        </button>
+      </div>
+      <p class="hint">Get one at platform.openai.com, console.anthropic.com, aistudio.google.com, openrouter.ai or groq.com. Free options exist (Gemini, Groq, OpenRouter free models).</p>
+    </div>
+    <div class="row check-row" id="encrypt-row">
+      <label><input id="set-encrypt" type="checkbox"> Lock my API key with a passphrase <span class="opt">(encrypted on this device)</span></label>
+      <p class="hint">The key is stored as unreadable ciphertext (AES-GCM + PBKDF2). You type the passphrase once per session. Forgot it? Just paste the key again — chats are never encrypted. Needs HTTPS or localhost.</p>
+    </div>
+    <div class="row" id="autolock-row" hidden>
+      <label for="set-autolock">Auto-lock when idle</label>
+      <select id="set-autolock">
+        <option value="0">Off</option>
+        <option value="1">After 1 minute</option>
+        <option value="5">After 5 minutes</option>
+        <option value="15">After 15 minutes</option>
+        <option value="30">After 30 minutes</option>
+      </select>
+      <p class="hint">Locks the key again if you stop using the app. Unlocking again just takes your passphrase.</p>
+    </div>
+    <div class="row">
+      <label for="set-model">Model</label>
+      <input id="set-model" list="model-options" autocomplete="off" spellcheck="false" placeholder="Type or pick a model">
+      <datalist id="model-options"></datalist>
+      <div class="model-actions">
+        <button id="btn-models" class="btn-ghost" type="button">Load model list</button>
+        <span id="model-status" class="hint" aria-live="polite"></span>
+      </div>
+    </div>
+
+    <div class="row">
+      <label for="set-mode">Answer mode</label>
+      <select id="set-mode"></select>
+      <p class="hint">Changes how the AI writes for you. “One shot” is the default for a reason.</p>
+    </div>
+    <div class="row" id="custom-prompt-row" hidden>
+      <label for="set-customprompt">Custom instructions for the AI</label>
+      <textarea id="set-customprompt" rows="5" placeholder="e.g. Always answer in bullet points. Never mention food. I'm a nurse; explain medical things at that level."></textarea>
+    </div>
+    <div class="row">
+      <label for="set-profile">About you <span class="opt">(optional, always included)</span></label>
+      <textarea id="set-profile" rows="4" placeholder="Anything the AI should always know. e.g. I take things literally. Give me word-for-word scripts. Don't offer more than 3 options."></textarea>
+    </div>
+
+    <details class="advanced">
+      <summary>Advanced</summary>
+      <div class="row">
+        <label for="set-temp">Answer style <span class="opt">— predictable ↔ imaginative</span></label>
+        <div class="range-row">
+          <input id="set-temp" type="range" min="0" max="1" step="0.05" value="0.6">
+          <output id="temp-val">0.6</output>
+        </div>
+        <p class="hint" id="temp-hint">Balanced — consistent but not robotic.</p>
+      </div>
+      <div class="row">
+        <label for="set-topp">Top-p <span class="opt">(usually leave at 1)</span></label>
+        <div class="range-row">
+          <input id="set-topp" type="range" min="0.05" max="1" step="0.05" value="1">
+          <output id="topp-val">1</output>
+        </div>
+      </div>
+      <div class="row">
+        <label for="set-maxtok">Max answer length <span class="opt">(tokens)</span></label>
+        <input id="set-maxtok" type="number" min="256" max="65536" step="256" value="8192">
+      </div>
+      <div class="row check-row">
+        <label><input id="set-stream" type="checkbox" checked> Show answers as they're written <span class="opt">(recommended)</span></label>
+      </div>
+    </details>
+  </div>
+
+  <div class="tab-body" data-tab-body="interface" hidden>
+    <div class="row">
+      <label for="set-theme">Theme</label>
+      <select id="set-theme">
+        <option value="dark">Dark</option>
+        <option value="light">Light</option>
+        <option value="auto">Match my device</option>
+      </select>
+    </div>
+    <div class="row">
+      <label for="set-fontscale">Text size</label>
+      <div class="range-row">
+        <input id="set-fontscale" type="range" min="0.85" max="1.5" step="0.05" value="1">
+        <output id="fontscale-val">100%</output>
+      </div>
+    </div>
+    <div class="row">
+      <label for="set-spacing">Text spacing</label>
+      <select id="set-spacing">
+        <option value="normal">Normal</option>
+        <option value="relaxed">Relaxed (easier to track lines)</option>
+      </select>
+    </div>
+    <div class="row check-row">
+      <label><input id="set-motion" type="checkbox"> Reduce all motion</label>
+    </div>
+    <div class="row">
+      <label for="set-voicelang">Voice input language <span class="opt">(blank = device default)</span></label>
+      <input id="set-voicelang" type="text" placeholder="e.g. en-US, es-ES, de-DE" autocomplete="off" spellcheck="false">
+      <p class="hint">Only affects the microphone button.</p>
+    </div>
+    <div id="tts-settings">
+      <div class="row check-row">
+        <label><input id="set-autospeak" type="checkbox"> Read new answers aloud automatically</label>
+        <p class="hint">The answer plays by itself when it's done — good for eyes-tired days.</p>
+      </div>
+      <div class="row">
+        <label for="set-ttsrate">Reading speed</label>
+        <div class="range-row">
+          <input id="set-ttsrate" type="range" min="0.6" max="1.6" step="0.05" value="1">
+          <output id="ttsrate-val">1.00×</output>
+        </div>
+      </div>
+      <div class="row">
+        <label for="set-ttsvoice">Reading voice</label>
+        <select id="set-ttsvoice"></select>
+        <p class="hint">Voices come from your device. The list fills in when settings opens.</p>
+      </div>
+    </div>
+    <p class="hint">These exist because screens can be loud. Make it comfortable.</p>
+  </div>
+
+  <div class="tab-body" data-tab-body="data" hidden>
+    <div class="row">
+      <label>Export</label>
+      <div class="btn-col">
+        <button id="btn-export-chat" class="btn-ghost" type="button">Download current chat (.md)</button>
+        <button id="btn-export-all" class="btn-ghost" type="button">Download all chats (.json)</button>
+      </div>
+      <p class="hint">Chats never leave your device except as messages to your chosen AI provider.</p>
+    </div>
+    <div class="row">
+      <label>Storage used</label>
+      <p class="hint" id="storage-usage">—</p>
+    </div>
+    <div class="row">
+      <label>Danger zone</label>
+      <button id="btn-clear-all" class="btn-danger" type="button">Delete ALL chats and settings</button>
+      <p class="hint">Two taps — the button asks you to confirm first.</p>
+    </div>
+  </div>
+
+  <div class="tab-body" data-tab-body="about" hidden>
+    <h3>What this is</h3>
+    <p>Anchor is a private chat app built for an AuDHD brain: complete one-shot answers, literal language, no pop-quiz follow-ups, and controls for how the AI behaves.</p>
+    <h3>Privacy</h3>
+    <p>Your API keys and chats are stored only in this browser. Chats live in IndexedDB (a large local database); settings stay in localStorage. Optionally lock your API key behind a passphrase so it's stored encrypted (Settings → AI). Nothing is sent anywhere except direct requests to the AI provider you choose. No analytics, no accounts, no server.</p>
+    <p>Voice input (mic button) uses your browser's built-in speech recognition — in Chrome/Edge that means Google's speech servers process the audio. The button hides itself if your browser can't do it. Read-aloud uses your device's built-in voices.</p>
+    <h3>Phone</h3>
+    <p>Android: open the menu → <strong>Install on this device</strong>, or your browser menu → “Install app”.</p>
+    <p>iPhone: Safari → Share button → <strong>Add to Home Screen</strong>. It then runs full-screen like a native app.</p>
+    <h3>Hand to know</h3>
+    <ul>
+      <li>Everything saves automatically — there is no save button.</li>
+      <li>Every message has copy / retry / edit buttons.</li>
+      <li>Keyboard: <kbd>Ctrl</kbd>+<kbd>K</kbd> (or <kbd>⌘</kbd>+<kbd>K</kbd>) = new chat. <kbd>Ctrl</kbd>+<kbd>F</kbd> = search all chats. <kbd>Esc</kbd> closes menus.</li>
+    </ul>
+  </div>
+</dialog>
+
+<dialog id="passphrase" aria-labelledby="pass-title">
+  <div class="dlg-head">
+    <h2 id="pass-title">Unlock</h2>
+    <button id="close-pass" class="icon-btn" aria-label="Close" title="Close">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="pass-body">
+    <p id="pass-desc" class="hint">Enter your passphrase.</p>
+    <div class="row">
+      <label for="pass-input">Passphrase</label>
+      <input id="pass-input" type="password" autocomplete="off" spellcheck="false">
+    </div>
+    <div class="row" id="pass-confirm-row" hidden>
+      <label for="pass-confirm">Repeat passphrase</label>
+      <input id="pass-confirm" type="password" autocomplete="off" spellcheck="false">
+    </div>
+    <div class="row" id="pass-strength-row" hidden>
+      <label>Strength</label>
+      <div class="pass-meter"><div id="pass-meter-fill" class="pass-meter-fill"></div></div>
+      <p class="hint"><span id="pass-strength-label"></span> Tip: 4+ random words are strong and easy to type.</p>
+    </div>
+    <p id="pass-error" class="hint pass-error" hidden></p>
+    <div class="pass-actions">
+      <button type="button" id="pass-cancel" class="btn-ghost">Cancel</button>
+      <button type="button" id="pass-ok" class="btn-primary">Unlock</button>
+    </div>
+  </div>
+</dialog>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<noscript><div style="padding:2rem;font-family:system-ui">Anchor needs JavaScript to run — it's a local app with no server.</div></noscript>
+<script src="app.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "name": "anchor",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "deploy": "node build.mjs && wrangler deploy",
+    "dev": "python3 -m http.server 8000"
+  },
+  "devDependencies": {
+    "wrangler": "^4.164.0"
+  }
+}
