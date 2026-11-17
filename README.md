@@ -74,6 +74,34 @@ everyone gets the update on their next visit, with old assets still working for 
 
 (`node build.mjs` is only for deploys — local dev serves the source folder directly.)
 
+## Version control + push-to-deploy (Git → GitHub → Cloudflare)
+
+The folder is already a git repo with everything committed. To put it on GitHub:
+
+```
+# once: put your name on commits (use the email linked to your GitHub)
+git config user.name "Your Name"
+git config user.email "you@example.com"
+
+# create an empty repo named "anchor" at github.com (Private recommended), then:
+git remote add origin https://github.com/<your-username>/anchor.git
+git push -u origin main
+```
+
+Then connect it to Cloudflare for **automatic deploys on every push**:
+
+1. Cloudflare dashboard → Workers & Pages → your **anchor** Worker
+2. Settings → Builds → **Connect** → authorize the Cloudflare GitHub app (give it access to the `anchor` repo)
+3. Pick the repo, branch `main`, and set:
+   - Build command: `node build.mjs`
+   - Deploy command: `npx wrangler deploy`
+4. Save
+
+From then on: edit → `git add -A` → `git commit -m "what changed"` → `git push` — live about a minute later.
+Pushes to other branches create preview URLs instead of touching the live app.
+
+No secrets ever sit in the repo — API keys live only in your browser's storage.
+
 ## What's inside
 
 **One-shot answers** — the default mode instructs the AI to:
