@@ -133,6 +133,7 @@ Star your favorite(s) — they move to the top and pin to the home screen.
 - reduce all motion
 
 **Other things that just work:**
+- honest about what it is: a large language model — helpful, sometimes wrong, **never professional advice**. Every screen says so, and there's a built-in **professional help finder** (map + listings for therapists, psychologists, psychiatrists, ADHD/autism assessment, GPs, and crisis support, searched by suburb or ZIP)
 - voice input — tap the mic, talk, tap again; words appear in the box (works best in Chrome/Edge/Safari; language adjustable in Settings → Display)
 - read answers aloud — **Listen** button on any answer; optional auto-play when a answer finishes, plus speed and voice pickers (Settings → Display)
 - search across all chats — sidebar search box, or `Ctrl/⌘ + F` (matches are highlighted, and you jump straight to the message)

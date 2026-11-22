@@ -2391,6 +2391,55 @@ function closeAbout() {
   try { $('#about').close(); } catch { /* not open */ }
 }
 
+/* ---------------------------- professional help finder ---------------------------- */
+
+const HELP_CATS = {
+  therapist: 'therapist',
+  psychologist: 'psychologist',
+  psychiatrist: 'psychiatrist',
+  adhd: 'ADHD autism assessment',
+  gp: 'general practitioner doctor',
+  crisis: 'crisis support center',
+};
+let helpCat = 'therapist';
+
+function openHelp() {
+  const input = $('#help-area');
+  try { input.value = localStorage.getItem('anchor.helparea') || ''; } catch { /* ignore */ }
+  try { $('#help').showModal(); } catch { /* already open */ }
+  setTimeout(() => input.focus(), 60);
+}
+
+function closeHelp() {
+  try { $('#help').close(); } catch { /* not open */ }
+}
+
+function runHelpSearch() {
+  const area = $('#help-area').value.trim();
+  if (!area) {
+    toast('Type a suburb, area, or ZIP code first.');
+    $('#help-area').focus();
+    return;
+  }
+  try { localStorage.setItem('anchor.helparea', area); } catch { /* ignore */ }
+  const query = HELP_CATS[helpCat] + ' near ' + area;
+  const enc = encodeURIComponent(query);
+  // keyless consumer embed (Google Maps share-embed) — loads only on this search
+  $('#help-map').src = 'https://maps.google.com/maps?q=' + enc + '&z=13&output=embed';
+  $('#help-maps-link').href = 'https://www.google.com/maps/search/?api=1&query=' + enc;
+  $('#help-web-link').href = 'https://www.google.com/search?q=' + enc;
+  $('#help-results').hidden = false;
+}
+
+function setHelpCat(cat) {
+  helpCat = HELP_CATS[cat] !== undefined ? cat : 'therapist';
+  document.querySelectorAll('.help-chip').forEach((c) => {
+    const on = c.dataset.cat === helpCat;
+    c.classList.toggle('active', on);
+    c.setAttribute('aria-pressed', String(on));
+  });
+}
+
 function switchTab(name) {
   document.querySelectorAll('.tab-btn').forEach((b) => {
     b.setAttribute('aria-selected', String(b.dataset.tab === name));
@@ -2673,6 +2722,19 @@ function wire() {
   $('#open-about').addEventListener('click', openAbout);
   $('#open-about-side').addEventListener('click', () => { closeSidebar(); openAbout(); });
   $('#close-about').addEventListener('click', closeAbout);
+  $('#open-help-empty').addEventListener('click', openHelp);
+  $('#open-help-about').addEventListener('click', openHelp);
+  $('#close-help').addEventListener('click', closeHelp);
+  $('#help-search').addEventListener('click', runHelpSearch);
+  $('#help-area').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); runHelpSearch(); }
+  });
+  $('#help').addEventListener('click', (e) => {
+    const chip = e.target.closest('.help-chip');
+    if (!chip) return;
+    setHelpCat(chip.dataset.cat);
+    if (!$('#help-results').hidden) runHelpSearch(); // live re-search once results are showing
+  });
   $('#model-pill').addEventListener('click', () => openSettings('ai'));
   $('#key-hint-btn').addEventListener('click', async () => {
     if (isLocked()) { await promptUnlock(); return; }

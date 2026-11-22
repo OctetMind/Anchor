@@ -115,7 +115,7 @@
 
       <div id="empty" class="empty">
         <h1>Hello.</h1>
-        <p class="lede">Ask anything and get a complete, structured answer in one go — no back-and-forth, no follow-up questions.</p>
+        <p class="lede">Ask an AI for the complete answer in one go — no back-and-forth, no follow-up questions.</p>
         <div class="finder-wrap" data-hide="#tool-list-empty">
           <div class="search-box">
             <svg class="ic ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
@@ -128,12 +128,17 @@
         </div>
         <div id="tool-list-empty" class="tool-grid"></div>
         <p class="dim">Everything stays on this device. Add an API key in <strong>Settings → AI</strong> to begin.</p>
+        <p class="dim ai-note">
+          Anchor runs on a large language model (AI). It can be wrong, and its answers are
+          <strong>not professional advice</strong> — medical, legal, financial, or otherwise.
+          <button type="button" id="open-help-empty" class="linklike">Find professional help →</button>
+        </p>
       </div>
     </div>
 
     <div id="composer-wrap">
       <div class="composer">
-        <textarea id="composer-input" rows="1" placeholder="Ask anything — you'll get the full answer in one go" aria-label="Your message"></textarea>
+        <textarea id="composer-input" rows="1" placeholder="Ask an AI — full answers, not professional advice" aria-label="Your message"></textarea>
         <button id="mic-btn" class="mic-btn" aria-label="Voice input" title="Voice input — tap again when done" aria-pressed="false" hidden>
           <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v1a7 7 0 0 0 14 0v-1"/><path d="M12 18v4"/></svg>
         </button>
@@ -343,6 +348,8 @@
     <h3>Privacy</h3>
     <p>Your API keys and chats are stored only in this browser. Chats live in IndexedDB (a large local database); settings stay in localStorage. Optionally lock your API key behind a passphrase so it's stored encrypted (Settings → AI). Nothing is sent anywhere except direct requests to the AI provider you choose. No analytics, no accounts, no server.</p>
     <p>Voice input (mic button) uses your browser's built-in speech recognition — in Chrome/Edge that means Google's speech servers process the audio. The button hides itself if your browser can't do it. Read-aloud uses your device's built-in voices.</p>
+    <h3>Not professional advice</h3>
+    <p>Anchor runs on a large language model (AI). It can be wrong, and answers are not professional advice — medical, legal, financial, or otherwise. For those, talk to a professional — <button type="button" id="open-help-about" class="linklike">find professional help near you</button>.</p>
     <h3>Phone</h3>
     <p>Android: open the menu → <strong>Install on this device</strong>, or your browser menu → "Install app".</p>
     <p>iPhone: Safari → Share button → <strong>Add to Home Screen</strong>. It then runs full-screen like a native app.</p>
@@ -352,6 +359,42 @@
       <li>Every message has copy / retry / edit buttons.</li>
       <li>Keyboard: <kbd>Ctrl</kbd>+<kbd>K</kbd> (or <kbd>⌘</kbd>+<kbd>K</kbd>) = new chat. <kbd>Ctrl</kbd>+<kbd>F</kbd> = search all chats. <kbd>Esc</kbd> closes menus.</li>
     </ul>
+  </div>
+</dialog>
+
+<dialog id="help" aria-labelledby="help-title">
+  <div class="dlg-head">
+    <h2 id="help-title">Find professional help</h2>
+    <button id="close-help" class="icon-btn" aria-label="Close" title="Close">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="help-body">
+    <p class="help-crisis">In immediate danger, or thinking about harming yourself? <strong>Call your local emergency number now.</strong></p>
+    <div class="row">
+      <label for="help-area">Suburb, area, or ZIP code</label>
+      <input id="help-area" type="text" placeholder="e.g. Austin TX · 90210 · Croydon" autocomplete="off" spellcheck="false">
+    </div>
+    <div class="row">
+      <label>Type of help</label>
+      <div class="help-cats" role="group" aria-label="Type of help">
+        <button type="button" class="help-chip active" data-cat="therapist" aria-pressed="true">Therapist</button>
+        <button type="button" class="help-chip" data-cat="psychologist" aria-pressed="false">Psychologist</button>
+        <button type="button" class="help-chip" data-cat="psychiatrist" aria-pressed="false">Psychiatrist</button>
+        <button type="button" class="help-chip" data-cat="adhd" aria-pressed="false">ADHD / autism assessment</button>
+        <button type="button" class="help-chip" data-cat="gp" aria-pressed="false">Doctor (GP)</button>
+        <button type="button" class="help-chip" data-cat="crisis" aria-pressed="false">Crisis support</button>
+      </div>
+    </div>
+    <button id="help-search" class="btn-primary wide" type="button">Show on map</button>
+    <div id="help-results" hidden>
+      <div class="help-links">
+        <a id="help-maps-link" class="btn-ghost" target="_blank" rel="noopener noreferrer">Open in Google Maps ↗</a>
+        <a id="help-web-link" class="btn-ghost" target="_blank" rel="noopener noreferrer">Search the web ↗</a>
+      </div>
+      <iframe id="help-map" title="Map of professional help near you" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+      <p class="hint">The map loads from Google only when you search — nothing is sent before then. Results are Google's listings, not Anchor's: check credentials, and ask about experience with ADHD and autism.</p>
+    </div>
   </div>
 </dialog>
 
