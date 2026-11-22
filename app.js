@@ -2726,6 +2726,8 @@ function wire() {
   $('#close-about').addEventListener('click', closeAbout);
   $('#open-help-empty').addEventListener('click', openHelp);
   $('#open-help-about').addEventListener('click', openHelp);
+  $('#open-help').addEventListener('click', openHelp);
+  $('#open-help-side').addEventListener('click', () => { closeSidebar(); openHelp(); });
   $('#close-help').addEventListener('click', closeHelp);
   $('#help-search').addEventListener('click', runHelpSearch);
   $('#help-area').addEventListener('keydown', (e) => {

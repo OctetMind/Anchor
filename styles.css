@@ -1005,6 +1005,13 @@ html[data-spacing="relaxed"] .bubble li { margin: 7px 0; }
   .chat-title { font-size: 0.98rem; }
 }
 
+/* narrow phones: keep the top bar usable with the extra help button —
+   theme moves out of the top bar (still in Settings → Display) */
+@media (max-width: 639px) {
+  #theme-toggle { display: none; }
+  .pill { max-width: 30vw; }
+}
+
 @media (min-width: 900px) {
   #open-sidebar, #backdrop { display: none; }
   #messages, .composer, .composer-hint { max-width: 780px; }
