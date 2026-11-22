@@ -35,31 +35,45 @@
     </button>
 
     <nav class="tools" aria-label="Quick tools">
-      <h2>Quick tools</h2>
-      <div class="finder-wrap" data-hide="#tool-list">
-        <div class="search-box">
-          <svg class="ic ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-          <input class="tool-finder" type="search" placeholder="What do you need?" aria-label="Find the right tool" autocomplete="off">
-          <button type="button" class="icon-btn icon-btn-sm finder-clear" hidden aria-label="Clear" title="Clear">
-            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
-          </button>
+      <h2 class="acc-head-wrap">
+        <button type="button" class="acc-head" id="acc-tools" aria-expanded="true" aria-controls="acc-tools-body">
+          <span>Quick tools</span>
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+      </h2>
+      <div class="acc-body" id="acc-tools-body">
+        <div class="finder-wrap" data-hide="#tool-list">
+          <div class="search-box">
+            <svg class="ic ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <input class="tool-finder" type="search" placeholder="What do you need?" aria-label="Find the right tool" autocomplete="off">
+            <button type="button" class="icon-btn icon-btn-sm finder-clear" hidden aria-label="Clear" title="Clear">
+              <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </button>
+          </div>
+          <div class="finder-results" hidden></div>
         </div>
-        <div class="finder-results" hidden></div>
+        <div id="tool-list"></div>
       </div>
-      <div id="tool-list"></div>
     </nav>
 
     <nav class="convos" aria-label="Conversations">
-      <h2>Chats</h2>
-      <div class="search-box">
-        <svg class="ic ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        <input id="search-input" type="search" placeholder="Search all chats" autocomplete="off" aria-label="Search all chats">
-        <button id="search-clear" class="icon-btn icon-btn-sm" hidden aria-label="Clear search" title="Clear">
-          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      <h2 class="acc-head-wrap">
+        <button type="button" class="acc-head" id="acc-chats" aria-expanded="false" aria-controls="acc-chats-body">
+          <span>Chats</span>
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
         </button>
+      </h2>
+      <div class="acc-body" id="acc-chats-body" hidden>
+        <div class="search-box">
+          <svg class="ic ic-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input id="search-input" type="search" placeholder="Search all chats" autocomplete="off" aria-label="Search all chats">
+          <button id="search-clear" class="icon-btn icon-btn-sm" hidden aria-label="Clear search" title="Clear">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div id="convo-list"></div>
+        <div id="search-results" hidden></div>
       </div>
-      <div id="convo-list"></div>
-      <div id="search-results" hidden></div>
     </nav>
 
     <div class="side-foot">

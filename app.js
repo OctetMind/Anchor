@@ -10,6 +10,7 @@ const LS_SETTINGS = 'anchor.settings.v1';
 const LS_CONVOS = 'anchor.convos.v1';
 const LS_LAST = 'anchor.last';
 const LS_SECRETS = 'anchor.secrets.v1';
+const LS_ACCORD = 'anchor.accordion.v1';
 
 const PROVIDERS = {
   openai: {
@@ -2341,6 +2342,37 @@ function closeSidebar() {
   $('#backdrop').hidden = true;
 }
 
+/* ---------------------------- sidebar accordions ---------------------------- */
+
+function accordDefaults() {
+  return { tools: true, chats: false };
+}
+
+function loadAccordState() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(LS_ACCORD) || '{}');
+    if (raw && typeof raw === 'object') return Object.assign(accordDefaults(), raw);
+  } catch { /* ignore */ }
+  return accordDefaults();
+}
+
+let accordState = loadAccordState();
+
+function applyAccord(name) {
+  const btn = $('#acc-' + name);
+  const body = $('#acc-' + name + '-body');
+  if (!btn || !body) return;
+  const open = !!accordState[name];
+  btn.setAttribute('aria-expanded', String(open));
+  body.hidden = !open;
+}
+
+function toggleAccord(name) {
+  accordState[name] = !accordState[name];
+  try { localStorage.setItem(LS_ACCORD, JSON.stringify(accordState)); } catch { /* ignore */ }
+  applyAccord(name);
+}
+
 const settingsDialog = () => $('#settings');
 
 function openSettings(tab) {
@@ -2503,6 +2535,8 @@ function wire() {
   $('#close-sidebar').addEventListener('click', closeSidebar);
   $('#backdrop').addEventListener('click', closeSidebar);
   $('#new-chat').addEventListener('click', newChat);
+  $('#acc-tools').addEventListener('click', () => toggleAccord('tools'));
+  $('#acc-chats').addEventListener('click', () => toggleAccord('chats'));
 
   // tools (+ favorites) — natural-language finder in sidebar + home screen
   document.querySelectorAll('.finder-wrap').forEach((wrap) => {
@@ -2903,6 +2937,8 @@ async function init() {
   applyPrefs();
   renderTools();
   wire();
+  applyAccord('tools');
+  applyAccord('chats');
   await initChatStorage();
 
   // self-heal: encryption flag on but secrets gone (wiped manually) -> plain mode

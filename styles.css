@@ -178,14 +178,28 @@ button {
 
 #close-sidebar { display: none; }
 
-#sidebar h2 {
+.acc-head-wrap { margin: 12px 2px 4px; }
+
+.acc-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
   font-size: 0.72rem;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--text-dim);
-  margin: 12px 6px 6px;
-  font-weight: 600;
+  padding: 9px 8px;
+  border-radius: 8px;
+  min-height: 40px;
 }
+.acc-head:hover { color: var(--text); background: var(--bg-hover); }
+.acc-head .chev { width: 1em; height: 1em; transition: transform 0.15s ease; }
+.acc-head[aria-expanded="true"] .chev { transform: rotate(180deg); }
+html[data-motion="reduce"] .acc-head .chev { transition: none; }
 
 .tools, .convos { overflow-y: auto; }
 
