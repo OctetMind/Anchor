@@ -2384,6 +2384,13 @@ function closeSettings() {
   try { settingsDialog().close(); } catch { /* not open */ }
 }
 
+function openAbout() {
+  try { $('#about').showModal(); } catch { /* already open */ }
+}
+function closeAbout() {
+  try { $('#about').close(); } catch { /* not open */ }
+}
+
 function switchTab(name) {
   document.querySelectorAll('.tab-btn').forEach((b) => {
     b.setAttribute('aria-selected', String(b.dataset.tab === name));
@@ -2663,6 +2670,9 @@ function wire() {
   });
   $('#open-settings').addEventListener('click', () => openSettings('ai'));
   $('#open-settings-side').addEventListener('click', () => { closeSidebar(); openSettings('ai'); });
+  $('#open-about').addEventListener('click', openAbout);
+  $('#open-about-side').addEventListener('click', () => { closeSidebar(); openAbout(); });
+  $('#close-about').addEventListener('click', closeAbout);
   $('#model-pill').addEventListener('click', () => openSettings('ai'));
   $('#key-hint-btn').addEventListener('click', async () => {
     if (isLocked()) { await promptUnlock(); return; }

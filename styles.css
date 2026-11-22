@@ -650,8 +650,8 @@ html[data-motion="reduce"] .mic-btn.listening::after {
 }
 .opt { font-weight: 400; color: var(--text-dim); font-size: 0.82rem; }
 
-.row input[type="url"], .row input[type="password"], .row input[type="text"],
-.row input[type="number"], .row select, .row textarea {
+.row input:not([type="range"]):not([type="checkbox"]):not([type="button"]),
+.row select, .row textarea {
   width: 100%;
   background: var(--bg);
   border: 1px solid var(--border);
@@ -703,10 +703,10 @@ details.advanced summary {
 }
 details.advanced[open] summary { border-bottom: 1px solid var(--border); margin-bottom: 16px; }
 
-#settings h3 { margin: 18px 0 6px; font-size: 1rem; }
-#settings h3:first-child { margin-top: 0; }
-#settings ul { padding-left: 1.3rem; }
-#settings li { margin: 4px 0; }
+#settings h3, #about h3 { margin: 18px 0 6px; font-size: 1rem; }
+#settings h3:first-child, #about h3:first-child { margin-top: 0; }
+#settings ul, #about ul { padding-left: 1.3rem; }
+#settings li, #about li { margin: 4px 0; }
 kbd {
   background: var(--bg-hover);
   border: 1px solid var(--border);
@@ -842,6 +842,22 @@ html[data-theme="light"] mark { background: rgba(61, 128, 108, 0.22); }
   outline-offset: 2px;
 }
 .act-btn.on { color: var(--accent); }
+
+/* ---------- about dialog ---------- */
+
+#about {
+  width: min(560px, 94vw);
+  max-height: min(86dvh, 900px);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--bg-raised);
+  color: var(--text);
+  padding: 0;
+  overflow: hidden;
+}
+#about::backdrop { background: rgba(0, 0, 0, 0.55); backdrop-filter: blur(2px); }
+
+.about-body { padding: 18px 20px 24px; overflow-y: auto; max-height: calc(86dvh - 110px); }
 
 /* ---------- toast ---------- */
 

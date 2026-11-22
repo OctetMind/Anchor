@@ -2,7 +2,7 @@
    works offline. NEVER touches API calls (cross-origin + POST pass through). */
 'use strict';
 
-const CACHE = 'anchor-v9';
+const CACHE = 'anchor-v10';
 const ASSETS = [
   './',
   './index.html',
