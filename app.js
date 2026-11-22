@@ -2365,6 +2365,8 @@ function applyAccord(name) {
   const open = !!accordState[name];
   btn.setAttribute('aria-expanded', String(open));
   body.hidden = !open;
+  const nav = btn.closest('nav');
+  if (nav) nav.classList.toggle('acc-open', open);
 }
 
 function toggleAccord(name) {

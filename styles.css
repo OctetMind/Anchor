@@ -201,7 +201,17 @@ button {
 .acc-head[aria-expanded="true"] .chev { transform: rotate(180deg); }
 html[data-motion="reduce"] .acc-head .chev { transition: none; }
 
-.tools, .convos { overflow-y: auto; }
+/* Sidebar sections: a collapsed section only takes its header height;
+   expanded section(s) share the remaining space and scroll inside themselves,
+   so the other section's header is always visible and tappable. */
+.tools, .convos {
+  flex: 0 0 auto;
+  min-height: 0;
+}
+.tools.acc-open, .convos.acc-open {
+  flex: 1 1 0;
+  overflow-y: auto;
+}
 
 #tool-list { display: flex; flex-direction: column; gap: 6px; }
 
