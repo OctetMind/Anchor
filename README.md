@@ -111,7 +111,7 @@ No secrets ever sit in the repo — API keys live only in your browser's storage
 - self-check before answering
 
 **You control the AI** (Settings → AI):
-- Provider: OpenAI, Anthropic, Google, OpenRouter, Groq, local Ollama, or any OpenAI-compatible endpoint
+- Provider: OpenAI, Anthropic, Google, OpenRouter, Requesty, Groq, local Ollama, or any OpenAI-compatible endpoint
 - Model (with a "Load model list" button that fetches your account's available models)
 - Temperature ("predictable ↔ imaginative"), top-p, max answer length, streaming on/off
 - Answer modes: One shot · Step by step · Simple words · Direct & minimal · Calm & steady · Custom

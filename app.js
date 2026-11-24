@@ -41,6 +41,13 @@ const PROVIDERS = {
     defaultModel: 'openai/gpt-4o-mini',
     needsKey: true,
   },
+  requesty: {
+    label: 'Requesty (AI router)',
+    kind: 'openai',
+    base: 'https://router.requesty.ai/v1',
+    defaultModel: 'openai/gpt-4o-mini',
+    needsKey: true,
+  },
   groq: {
     label: 'Groq (fast, free tier)',
     kind: 'openai',
@@ -127,48 +134,49 @@ const TOOLS = [
     id: 'steps',
     label: 'Break it down',
     desc: 'Task → small steps',
-    template: 'Break this into small, doable steps for me. One action per step, with a rough time estimate. Tell me the single first thing to do.\n\nThe task:\n',
+    template: 'Numbered steps I do myself: verb first, one action each, rough minutes. Steps, not the finished work. End with: Done when: …\n\nThe task:\n',
   },
   {
     id: 'start',
     label: 'Just start',
     desc: 'Get past the blank stare',
-    template: "I'm stuck on starting this. Give me: (1) the smallest possible 2-minute version of the first action, (2) exactly what \"done\" looks like for today. No pep talk.\n\nThe thing I'm avoiding:\n",
+    template: "I'm stuck on starting this. Numbered steps, verb first, one action each, rough minutes; first step under 2 minutes. No finished answer.\n\nEnd with: Done when: …\n\nThe thing I'm avoiding:\n",
   },
   {
     id: 'howstart',
     label: 'How to start a task',
     desc: 'Tips & tricks to begin',
     template:
-      "I struggle to start this task. Give me tricks for getting started that actually fit THIS task.\n\nThe task:\n\nRules:\n" +
-      '- 3-5 concrete tricks (for example: shrink the first step to 2 minutes, body doubling, change location or posture, visible countdown timer, do a 1-minute warm-up task first, remove one piece of friction, tell someone your first step).\n' +
-      '- One line each, saying exactly how to apply it to this task.\n' +
-      '- End with "Try this first: …" picking the single best one.\n' +
-      '- No motivational filler, no shame.',
+      "I struggle to start this task. Give me numbered steps to start THIS task: verb first, one action each, rough minutes.\n\nThe task:\n\nRules:\n" +
+      '- Each step names the exact action and where it happens.\n' +
+      '- Use body doubling, a visible timer or less friction where it fits.\n' +
+      '- Steps, not tips to try later.\n' +
+      '- No motivational filler, no shame.\n' +
+      '- End with: Done when: …',
   },
   {
     id: 'decide',
     label: 'Decide for me',
     desc: 'End decision paralysis',
-    template: 'Decide for me.\n\nThe options:\n\nWhat matters most to me:\n\nPick ONE option, say why in 2 lines, and tell me what to do first.',
+    template: 'Decide for me.\n\nThe options:\n\nWhat matters most to me:\n\nPick ONE, why in 2 lines, then numbered steps, verb first.',
   },
   {
     id: 'simple',
     label: 'Explain simply',
     desc: 'Plain language, short',
-    template: 'Explain this like I\'m smart but tired. Short sentences, no jargon:\n\n',
+    template: 'Explain like I\'m smart but tired, then numbered steps to use it:\n\n',
   },
   {
     id: 'script',
     label: 'Write it for me',
     desc: 'Word-for-word message',
-    template: "Write this for me word-for-word, ready to send. Keep it short, clear and kind.\n\nWhat it's about and who it's for:\n",
+    template: "Write the message word-for-word: short, clear, kind.\n\nThen steps to send.\n\nWhat it's about and who it's for:\n",
   },
   {
     id: 'sort',
     label: 'Sort brain dump',
     desc: 'Mess → organized',
-    template: "Sort my brain dump below into: to-dos, ideas, worries, and everything else. Turn the to-dos into a short list of concrete actions.\n\nHere's the dump:\n",
+    template: "Sort this dump with me: numbered steps, verb first, one action each, rough minutes. Not the sorted list.\n\nEnd with: Done when: …\n\nHere's the dump:\n",
   },
   {
     id: 'howlong',
@@ -176,10 +184,10 @@ const TOOLS = [
     desc: 'Realistic time estimate',
     template:
       'Estimate how long this task will really take me. I have ADHD, so include the hidden parts: setup, finding things, switching into it, breaks, cleanup.\n\nThe task:\n\nRules:\n' +
-      '- Give an honest range: fast day / normal day / bad brain day.\n' +
-      '- Break it into stages with minutes each.\n' +
-      '- If this kind of task usually takes longer than I think, say so plainly.\n' +
-      '- End with "Book this much time: …"',
+      '- Answer first: honest range (fast, normal, bad), stages with minutes.\n' +
+      '- Then numbered steps: book the time, set a timer, stop at the end.\n' +
+      '- Say plainly if it takes longer than I think.\n' +
+      '- One answer, not options.',
   },
   {
     id: 'fits',
@@ -187,57 +195,54 @@ const TOOLS = [
     desc: 'Match task to time + energy',
     template:
       'I have this much time right now: [minutes]\nMy energy is: [low / medium / good]\n\nThings I could do:\n\n\n' +
-      'Pick what realistically fits right now. Rules:\n' +
-      '- Max 1 main thing + 1 easy bonus thing.\n' +
-      '- If nothing fits, say so and give the smallest useful 5-minute option instead.\n' +
-      '- Tell me what "enough" looks like when time is up, so I can stop without guilt.',
+      'Answer first: the one main thing that fits, plus one easy bonus.\n' +
+      'Then numbered steps to start it, verb first.\n' +
+      'Say what "enough" looks like when time is up.\n' +
+      'If nothing fits, say so and give the smallest 5-minute step.',
   },
   {
     id: 'three',
     label: "Today's 3",
     desc: 'Pick 3, one must-do',
     template:
-      "Here's everything on my mind. Pick exactly 3 things for today — no more.\n\nEverything:\n\nRules:\n" +
-      '- One must-do: the thing with real consequences if it slips.\n' +
-      "- Two smaller or half-done versions of other things.\n" +
-      "- If something has been dodged for weeks, shrink it until it's startable today.\n" +
-      '- Everything not picked goes under "Not today — and that\'s fine."',
+      "Here's everything on my mind. Pick exactly 3 for today — one must-do, no more.\n\nEverything:\n\nRules:\n" +
+      '- Answer first: the 3, each shrunk until it is startable today.\n' +
+      '- Then numbered steps for the first one, verb first, minutes each.\n' +
+      "- Those 3 are the answer. The rest waits; no guilt list.",
   },
   {
     id: 'call',
     label: 'Call walker',
     desc: 'Survive phone calls',
     template:
-      "I need to make this phone call and I keep avoiding it.\n\nWho I'm calling and what it's about:\n\nRules:\n" +
-      '- What to have ready before dialing (account numbers, dates, a notes doc).\n' +
-      '- The exact opening line, word-for-word.\n' +
-      "- Likely questions they'll ask, with my answers as fill-in blanks.\n" +
-      '- Two lines for if I get confused or need a moment.\n' +
-      '- What to write down during the call.\n' +
-      '- One tiny after-the-call step (log it, calendar the follow-up).',
+      "I need to make this phone call and I keep avoiding it.\n\nWho I'm calling and what it's about:\n\nNumbered steps, verb first, one action and minutes each; no script:\n" +
+      '- Before dialling: account numbers, dates, notes ready.\n' +
+      '- Dial: press call and breathe.\n' +
+      '- First 15 seconds: say who I am and why.\n' +
+      '- If confused: ask them to hold a moment.\n' +
+      '- During: write names, numbers, promises.\n' +
+      '- After: log the call and next date.\n' +
+      'End with: Done when: …',
   },
   {
     id: 'hardtalk',
     label: 'Hard conversation prep',
     desc: 'Scripts + responses',
     template:
-      "I need to have a conversation I'd rather avoid. Prep me for it.\n\nThe situation and what I want out of it:\n\nRules:\n" +
-      '- How to open, word-for-word.\n' +
-      '- My 2-3 key points, in order.\n' +
-      '- What to say if they respond with: anger, guilt-tripping, or "later".\n' +
-      '- One clean exit line for however it goes.\n' +
-      '- Kind but firm. No apologizing for having needs.',
+      "I need to have a conversation I'd rather avoid. Prep me for it.\n\nThe situation and what I want out of it:\n\nNumbered steps, one action each, verb first, minutes; no script:\n" +
+      '- Name what I want.\n' +
+      '- Open with one line.\n' +
+      '- Say my 2-3 points in order.\n' +
+      '- If they push back: ask one question.\n' +
+      '- Exit line for however it goes.\n' +
+      'End with: Done when: …',
   },
   {
     id: 'switch',
     label: 'Transition helper',
     desc: 'Switch tasks smoothly',
     template:
-      "I'm stuck doing [current thing] and I need to switch to [next thing].\n\nGive me a transition plan:\n" +
-      '- A 2-minute wind-down for leaving the current thing (save point, quick note, stand up).\n' +
-      '- The exact first physical move into the new thing.\n' +
-      '- One sentence making the switch feel allowed — the old thing will still be there later.\n' +
-      '- Total transition time: under 5 minutes.',
+      "I'm stuck doing [current thing] and I need to switch to [next thing].\n\nNumbered steps I follow now: verb first, one action each, rough minutes, under 5 total. Steps, not a plan to read later.\n\nEnd with: Done when: …",
   },
   {
     id: 'decode',
@@ -245,11 +250,10 @@ const TOOLS = [
     desc: 'What did they mean?',
     template:
       "I received this message and I can't tell how to read it. Decode it for me.\n\nThe message:\n\nRules:\n" +
-      '- The most literal, neutral reading of what it actually says.\n' +
-      '- What is being asked of me, if anything.\n' +
-      '- Max 2 genuinely unclear things, phrased as assumptions I could check.\n' +
-      '- Two ready-to-send replies: a short one and a slightly warmer one.\n' +
-      "- If there's no hidden meaning, say that plainly. Don't invent one.",
+      '- Answer first: the most literal, neutral reading, and what is being asked.\n' +
+      '- Up to 2 unclear things, stated as assumptions I can check.\n' +
+      '- Then numbered steps to reply: one message I can send, not two.\n' +
+      "- If there's no hidden meaning, say that plainly.",
   },
   {
     id: 'tone',
@@ -257,11 +261,10 @@ const TOOLS = [
     desc: 'Before you hit send',
     template:
       'Check how this comes across before I send it.\n\nMy draft:\n\nRules:\n' +
-      '- One line on the tone it reads as (blunt, warm, annoyed, fine…).\n' +
-      '- Anything that could land badly, quoted exactly.\n' +
-      '- Two rewrites: more direct, and softer — keep my meaning.\n' +
-      "- Keep my voice; don't make me sound corporate.\n" +
-      '- End with a verdict: which version to send.',
+      '- Answer first: one line on the tone, and anything that could land badly, quoted.\n' +
+      '- Then the one version to send: my voice, my meaning, not corporate.\n' +
+      '- Then numbered steps: what to change, then send.\n' +
+      '- One answer, not options.',
   },
   {
     id: 'summarize',
@@ -269,10 +272,9 @@ const TOOLS = [
     desc: 'Long text → 5 bullets',
     template:
       'Summarize this for me.\n\nThe text:\n\nRules:\n' +
-      '- Max 5 bullets, plain language.\n' +
-      '- One line: what I need to DO because of this, and by when.\n' +
-      '- One line: what I can safely ignore.\n' +
-      '- No new jargon.',
+      '- Answer first: max 5 bullets, plain, no new jargon.\n' +
+      '- One line: what I must do, by when; one line to ignore.\n' +
+      '- Then numbered steps to do it.',
   },
   {
     id: 'rescue',
@@ -280,11 +282,12 @@ const TOOLS = [
     desc: 'Frozen → one next thing',
     template:
       "I'm overwhelmed and frozen right now. Help me get moving again, gently.\n\nThe situation (as much as I can type):\n\nRules:\n" +
-      '- No lectures, no "shoulds", no pretending it\'s fine.\n' +
-      '- First: a tiny grounding sequence — 3 physical steps, under 2 minutes total.\n' +
-      "- Then: ONE next action so small it sounds almost insulting. That's the right size.\n" +
-      '- Then: one direction for after it — no pressure, no list.\n' +
-      '- If this sounds like a medical or safety emergency, say so clearly and tell me to contact real help (emergency services or someone near me).',
+      '- Numbered steps, verb first, one action, rough minutes.\n' +
+      '- First 3 steps: a tiny grounding sequence, under 2 minutes total.\n' +
+      "- Then ONE next action so small it sounds insulting. That's the right size.\n" +
+      '- No lectures, no "shoulds".\n' +
+      '- End with: Done when: …\n' +
+      '- If this sounds like a medical or safety emergency, say so clearly and tell me to contact real help.',
   },
   {
     id: 'routine',
@@ -292,33 +295,37 @@ const TOOLS = [
     desc: 'Steps with real times',
     template:
       'Build me a routine I can actually follow.\n\nThe routine I need (e.g. leaving the house, starting work, going to bed) and roughly when:\n\nRules:\n' +
-      '- Numbered steps, one action each, in order.\n' +
+      '- Numbered steps, verb first, one action each, in order.\n' +
       '- Realistic minutes per step for a slow day.\n' +
-      '- Mark the 2-3 load-bearing steps (skip those and it collapses).\n' +
-      '- One reset line: what to do if it derails midway.\n' +
-      '- Short enough to fit one screen.',
+      '- Mark the 2-3 load-bearing steps.\n' +
+      '- One reset line if it derails midway.\n' +
+      '- Steps, not a polished schedule.\n' +
+      '- End with: Done when: …',
   },
   {
     id: 'futureme',
     label: 'Note to future me',
     desc: 'Keep the context',
     template:
-      "I need to leave a note for future me, who will have forgotten all context.\n\nMy scribbles:\n\nRules:\n" +
-      '- Turn it into a clear direct instruction: what to do, in order.\n' +
-      "- Add the context I'll have lost: why it matters, where things are, who's involved.\n" +
-      '- Format: "FUTURE ME: [the mission]" at the top, then the steps, then "It\'s done when: …"\n' +
-      '- Make dates and times explicit. If something is ambiguous, state your assumption in one line.',
+      "I need to leave a note for future me, who will have forgotten all context.\n\nMy scribbles:\n\nNumbered steps, verb first, one action and minutes each; write it with me, not for me:\n" +
+      '- Mission line: "FUTURE ME: [the mission]".\n' +
+      '- Why it matters, in one line.\n' +
+      "- Where things are and who's involved.\n" +
+      '- Dates and times, explicit.\n' +
+      '- The order to do it in.\n' +
+      'End with: Done when: …',
   },
 ];
 
 const DEFAULT_SETTINGS = {
   provider: 'openai',
-  keys: { openai: '', anthropic: '', google: '', openrouter: '', groq: '', ollama: '', custom: '' },
+  keys: { openai: '', anthropic: '', google: '', openrouter: '', requesty: '', groq: '', ollama: '', custom: '' },
   bases: {
     openai: 'https://api.openai.com/v1',
     anthropic: 'https://api.anthropic.com',
     google: 'https://generativelanguage.googleapis.com',
     openrouter: 'https://openrouter.ai/api/v1',
+    requesty: 'https://router.requesty.ai/v1',
     groq: 'https://api.groq.com/openai/v1',
     ollama: 'http://localhost:11434/v1',
     custom: '',
@@ -328,6 +335,7 @@ const DEFAULT_SETTINGS = {
     anthropic: 'claude-sonnet-4-5',
     google: 'gemini-2.5-flash',
     openrouter: 'openai/gpt-4o-mini',
+    requesty: 'openai/gpt-4o-mini',
     groq: 'llama-3.3-70b-versatile',
     ollama: 'llama3.2',
     custom: '',
@@ -337,6 +345,7 @@ const DEFAULT_SETTINGS = {
   maxTokens: 8192,
   mode: 'oneshot',
   customPrompt: '',
+  masterPrompt: 'Help me do it myself, don\'t do it for me. Give me the next step or two in plain words — not a tutorial, not a full plan. If I ask a question, answer it directly, then give me the next step.',
   profile: '',
   favoriteTools: [],
   voiceLang: '',
@@ -908,6 +917,9 @@ function buildSystemPrompt() {
     '- Say clearly when you are unsure or guessing.\n\n' +
     'Current answer mode — ' + (MODES[mode].label || mode) + ':\n' + modeText;
 
+  const master = settings.masterPrompt.trim();
+  if (master) out += '\n\nHow to help me (always applies):\n' + master + '\nWhere this differs from anything above, this wins.';
+
   const profile = settings.profile.trim();
   if (profile) out += '\n\nAbout the user (always applies):\n' + profile;
   return out;
@@ -966,6 +978,34 @@ function openPassDialog(mode) {
     dlg.showModal();
     setTimeout(() => $('#pass-input').focus(), 60);
   });
+}
+
+function openRenameDialog(id) {
+  const c = convos.find((x) => x.id === id);
+  if (!c) return;
+  const dlg = $('#rename-chat');
+  if (dlg.open) return;
+  dlg.dataset.id = id;
+  const input = $('#rename-input');
+  input.value = c.title || '';
+  $('#rename-ok').disabled = !input.value.trim();
+  dlg.showModal();
+  setTimeout(() => {
+    input.focus();
+    input.select();
+  }, 60);
+}
+
+function openDeleteDialog(id) {
+  const c = convos.find((x) => x.id === id);
+  if (!c) return;
+  const dlg = $('#delete-chat');
+  if (dlg.open) return;
+  dlg.dataset.id = id;
+  $('#delete-chat-name').textContent = c.title || 'Untitled chat';
+  dlg.showModal();
+  // safe default: focus lands in the dialog, on Cancel, not on the destructive button
+  setTimeout(() => $('#delete-cancel').focus(), 60);
 }
 
 function closePass(result) {
@@ -1296,6 +1336,9 @@ function friendlyError(err) {
   if (err instanceof TypeError || /fetch|network/i.test(err.message || '')) {
     return 'Could not reach the server. Check your connection and the Base URL. Using Ollama or LM Studio? Start it with browser access allowed, e.g. OLLAMA_ORIGINS="*" ollama serve.';
   }
+  // Plain Errors thrown before any request (e.g. "Add your API key first.") already
+  // carry an actionable message; show it instead of the unhelpful generic fallback.
+  if (!err.status && err.name === 'Error' && err.message) return err.message;
   return 'Something went wrong talking to the AI. Tap Retry, or check Settings → AI.';
 }
 
@@ -1344,7 +1387,7 @@ function extractDelta(kind, j) {
   return '';
 }
 
-async function streamChat({ messages, system, onDelta, signal }) {
+async function streamChat({ messages, system, onDelta, signal, maxTokens, temperature, streamOverride }) {
   const conf = providerConf();
   const kind = conf.kind;
   const key = apiKey();
@@ -1359,7 +1402,9 @@ async function streamChat({ messages, system, onDelta, signal }) {
   }
 
   const hist = normalizeHistory(messages);
-  const stream = settings.stream;
+  const stream = streamOverride ?? settings.stream;
+  const maxTok = maxTokens ?? settings.maxTokens;
+  const temp = temperature ?? settings.temperature;
   let headers = { 'Content-Type': 'application/json' };
 
   const consume = async (res) => {
@@ -1389,9 +1434,9 @@ async function streamChat({ messages, system, onDelta, signal }) {
     const body = {
       model,
       messages: [{ role: 'system', content: system }, ...hist.map((m) => ({ role: m.role, content: m.text }))],
-      temperature: settings.temperature,
+      temperature: temp,
       top_p: settings.topP,
-      max_tokens: settings.maxTokens,
+      max_tokens: maxTok,
       stream,
     };
     // Newer OpenAI models reject some legacy params — read the server's complaint
@@ -1403,7 +1448,7 @@ async function streamChat({ messages, system, onDelta, signal }) {
       if (err.status === 400 && attempt < 3) {
         const msg = err.message || '';
         if (/max_tokens|max_completion_tokens/i.test(msg)) {
-          const mt = body.max_tokens ?? body.max_completion_tokens ?? settings.maxTokens;
+          const mt = body.max_tokens ?? body.max_completion_tokens ?? maxTok;
           delete body.max_tokens;
           body.max_completion_tokens = mt;
           continue;
@@ -1422,8 +1467,8 @@ async function streamChat({ messages, system, onDelta, signal }) {
       model,
       system,
       messages: hist.map((m) => ({ role: m.role, content: [{ type: 'text', text: m.text }] })),
-      max_tokens: settings.maxTokens,
-      temperature: Math.min(settings.temperature, 1),
+      max_tokens: maxTok,
+      temperature: Math.min(temp, 1),
       top_p: settings.topP,
       stream,
     };
@@ -1440,14 +1485,31 @@ async function streamChat({ messages, system, onDelta, signal }) {
     systemInstruction: { parts: [{ text: system }] },
     contents: hist.map((m) => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.text }] })),
     generationConfig: {
-      temperature: settings.temperature,
+      temperature: temp,
       topP: settings.topP,
-      maxOutputTokens: settings.maxTokens,
+      maxOutputTokens: maxTok,
     },
   };
   const res = await fetch(url, { method: 'POST', headers, body: JSON.stringify(body), signal });
   if (!res.ok) throw await httpError(res);
   await consume(res);
+}
+
+/* One-shot request: same provider/auth/body builders as streamChat, with
+   streaming forced off and the reply returned as plain text. Used only by
+   the tool finder; its errors are handled silently by the caller. */
+async function chatOnce({ system, user, signal, maxTokens = 40 }) {
+  let text = '';
+  await streamChat({
+    messages: [{ role: 'user', text: user }],
+    system,
+    onDelta: (d) => { text += d; },
+    signal,
+    maxTokens,
+    temperature: 0,
+    streamOverride: false,
+  });
+  return text;
 }
 
 async function fetchModels() {
@@ -1529,126 +1591,43 @@ function flashSaved() {
 
 /* ---------------------------- natural-language tool finder ---------------------------- */
 
-const STOP = new Set(
-  ('i im ive to a an the my me about for with of on in at and or is are it its this that these those ' +
-    'them they you your yours please so but if then when what which who whom whose why how now do does ' +
-    'did doing be been being was were will would could should shall may might must just really very ' +
-    'some something someone anybody anything stuff person people thing things').split(' ')
-);
+/* Keyword matching and AI-search parsing live in search-core.js (loaded as a
+   module before this script, and imported directly by the Node tests). These
+   thin wrappers keep the call sites here readable. */
+const findTools = (query) => AnchorSearch.findTools(query, TOOLS);
 
-const TOOL_MATCH = {
-  steps: { phrases: ['break it down', 'step by step', 'how do i do', 'piece by piece'], words: ['step', 'instruction', 'plan', 'checklist', 'guide', 'project', 'task', 'big', 'breakdown'] },
-  start: { phrases: ['get started', 'just start', 'keep avoiding', 'get going', 'cant start', "can't start", 'get past'], words: ['start', 'stuck', 'avoid', 'avoiding', 'procrastinate', 'begin', 'first', 'action', 'dread'] },
-  howstart: { phrases: ['how to start', 'tips for starting', 'ways to start', 'start a task'], words: ['tip', 'trick', 'strategy', 'strategies', 'motivation', 'hack'] },
-  howlong: { phrases: ['how long', 'time estimate', 'will it take', 'how much time'], words: ['long', 'estimate', 'duration', 'minutes', 'hours', 'spend'] },
-  fits: { phrases: ['what can i do', 'short on time', 'little time', 'spare time'], words: ['energy', 'battery', 'window', 'gap', 'capacity', 'fit'] },
-  three: { phrases: ['what should i do today', 'most important', 'pick for me'], words: ['today', 'prioritize', 'priority', 'focus', 'three', 'top'] },
-  call: { phrases: ['phone call', 'make a call', 'call them', 'phone them', 'ring them'], words: ['call', 'phone', 'dial', 'telephone', 'receptionist', 'helpline'] },
-  hardtalk: { phrases: ['hard conversation', 'difficult conversation', 'awkward conversation', 'talk to my boss', 'need to tell', 'set a boundary'], words: ['conversation', 'difficult', 'awkward', 'confront', 'boundary', 'boundaries', 'boss', 'argument'] },
-  switch: { phrases: ['switch tasks', 'switch to', 'transition between', 'stop doing'], words: ['switch', 'transition', 'change', 'move', 'shift', 'pivot'] },
-  decode: { phrases: ['what did they mean', 'what they meant', 'hidden meaning', 'reading into'], words: ['message', 'text', 'email', 'mean', 'interpret', 'subtext', 'reply'] },
-  tone: { phrases: ['tone check', 'how does this sound', 'before i send', 'sounds rude', 'sounds harsh', 'sounds aggressive'], words: ['tone', 'rude', 'blunt', 'soften', 'harsh', 'across', 'draft'] },
-  summarize: { phrases: ['summarize this', 'main points', 'key points', 'too long', 'tldr'], words: ['summarize', 'summarise', 'summary', 'shorten', 'condense', 'article', 'bullet', 'skim'] },
-  rescue: { phrases: ['too much', 'shut down', 'cant move', "can't move", 'cant function', "can't function", 'falling apart', 'melting down'], words: ['overwhelmed', 'frozen', 'panic', 'meltdown', 'shutdown', 'spiral', 'drowning', 'anxious', 'anxiety', 'burnout'] },
-  routine: { phrases: ['morning routine', 'evening routine', 'leaving the house', 'wind down', 'bedtime'], words: ['routine', 'morning', 'evening', 'night', 'bed', 'habit', 'daily', 'schedule'] },
-  futureme: { phrases: ['future me', 'dont forget', "don't forget", 'will forget', 'note to self'], words: ['note', 'remember', 'forget', 'future', 'reminder', 'scribble', 'context'] },
-  decide: { phrases: ['decide for me', 'cant decide', "can't decide", 'make the decision', 'decision paralysis', 'pick one'], words: ['decide', 'decision', 'choose', 'option', 'options', 'choice', 'indecisive', 'paralysis'] },
-  simple: { phrases: ['explain like', 'in plain english', 'too complicated', 'what does this mean', 'dont understand', "don't understand"], words: ['explain', 'simple', 'simplify', 'understand', 'confusing', 'jargon', 'plain', 'eli5'] },
-  script: { phrases: ['write it for me', 'what should i say', 'how do i say', 'word for word', 'ready to send'], words: ['write', 'draft', 'compose', 'letter', 'response', 'wording', 'script'] },
-  sort: { phrases: ['brain dump', 'sort my thoughts', 'too many thoughts', 'mess in my head', 'all over the place'], words: ['dump', 'messy', 'organize', 'organise', 'sort', 'chaos', 'thoughts', 'jumble', 'scattered'] },
-};
-
-// tools that often go together with a matched tool
-const TOOL_HINTS = {
-  call: ['start', 'howstart'],
-  hardtalk: ['script', 'decode'],
-  steps: ['three', 'howlong'],
-  start: ['howstart'],
-  decode: ['tone', 'script'],
-  summarize: ['simple'],
-  rescue: ['three'],
-  fits: ['howlong'],
-  three: ['sort'],
-  futureme: ['sort'],
-  switch: ['start'],
-};
-
-function stem(w) {
-  if (w.length > 5 && w.endsWith('ing')) return w.slice(0, -3);
-  if (w.length > 4 && w.endsWith('ed')) return w.slice(0, -2);
-  if (w.length > 4 && w.endsWith('ies')) return w.slice(0, -3) + 'y';
-  if (w.length > 3 && w.endsWith('es')) return w.slice(0, -2);
-  if (w.length > 3 && w.endsWith('s')) return w.slice(0, -1);
-  return w;
-}
-
-function tokenize(q) {
-  return q
-    .toLowerCase()
-    .replace(/tl;dr/g, 'tldr')
-    .replace(/[^a-z0-9]+/g, ' ')
-    .trim()
-    .split(/\s+/)
-    .filter((w) => w.length > 1 && !STOP.has(w))
-    .map(stem);
-}
-
-function findTools(query) {
-  const tokens = tokenize(query);
-  if (!tokens.length) return [];
-  const raw = query.toLowerCase();
-  const results = [];
-  for (const t of TOOLS) {
-    const dict = TOOL_MATCH[t.id] || {};
-    let score = 0;
-    const why = new Set();
-    for (const ph of dict.phrases || []) {
-      if (raw.includes(ph)) { score += 6; why.add(ph); }
-    }
-    for (const w of dict.words || []) {
-      if (tokens.includes(stem(w))) { score += 3; why.add(w); }
-    }
-    // the tool's own label/description words count a little
-    const labelWords = (t.label + ' ' + t.desc).toLowerCase().match(/[a-z]+/g) || [];
-    for (const w of labelWords) {
-      if (w.length > 2 && !STOP.has(w) && tokens.includes(stem(w))) score += 1;
-    }
-    if (score > 0) results.push({ tool: t, score, why: [...why] });
-  }
-  // "often used together" suggestions
-  const hinted = new Map();
-  for (const r of results) {
-    for (const id of TOOL_HINTS[r.tool.id] || []) {
-      if (!results.some((x) => x.tool.id === id)) {
-        hinted.set(id, Math.max(2, hinted.get(id) || 2));
-      }
-    }
-  }
-  for (const [id, s] of hinted) {
-    const t = TOOLS.find((x) => x.id === id);
-    if (t) results.push({ tool: t, score: s, why: ['related'] });
-  }
-  return results.sort((a, b) => b.score - a.score).filter((r) => r.score >= 2).slice(0, 4);
-}
-
-function renderFinder(query, resultsEl, listEl) {
-  const q = query.trim();
+function renderFinder(query, resultsEl, listEl, aiTools = []) {
+  const q = String(query || '').trim();
   if (!q) {
     resultsEl.hidden = true;
     resultsEl.innerHTML = '';
     if (listEl) listEl.style.display = '';
-    return;
+    return [];
   }
+  const known = (t) => !!t && TOOLS.some((x) => x.id === t.id);
+  const picks = aiTools.filter(known);
   const matches = findTools(q);
-  if (!matches.length) {
+  // AI picks never duplicate a keyword hit; keyword results always stay.
+  const aiIds = AnchorSearch.pickAiTools(picks.map((t) => t.id), matches.map((m) => m.tool.id));
+  const aiHtml = aiIds.length
+    ? '<div class="finder-group">' +
+      '<p class="finder-group-title">Closest match <span class="finder-guess">AI guess</span></p>' +
+      aiIds.map((id) => {
+        const t = TOOLS.find((x) => x.id === id);
+        return '<div class="finder-hit">' + toolBtnHtml(t) + '</div>';
+      }).join('') +
+      '</div>'
+    : '';
+
+  if (!matches.length && !aiIds.length) {
     resultsEl.hidden = false;
     resultsEl.innerHTML = '<p class="finder-msg">No tool matched that — try other words, or browse the list.</p>';
     if (listEl) listEl.style.display = '';
-    return;
+    return [];
   }
   if (listEl) listEl.style.display = 'none';
   resultsEl.hidden = false;
-  resultsEl.innerHTML = matches
+  const keywordHtml = matches
     .map((m) => {
       const why = m.why[0] === 'related'
         ? 'often used together'
@@ -1660,8 +1639,91 @@ function renderFinder(query, resultsEl, listEl) {
       );
     })
     .join('');
+  // Only when the AI carried the result does the keyword empty state change.
+  const emptyNote = !matches.length && aiIds.length
+    ? '<p class="finder-msg">No exact keyword match — the pick above is a guess.</p>'
+    : '';
+  resultsEl.innerHTML = aiHtml + keywordHtml + emptyNote;
+  return matches;
 }
 
+/* ---------------------------- AI-assisted search ----------------------------
+   Keyword results render instantly and are never removed. A sentence-like
+   query with weak keyword results may also ask the configured model for up
+   to 3 tool ids; those show in a separate "Closest match" group. Every
+   failure (no key, offline, timeout, provider error) is silent. */
+
+const AI_SEARCH_SYSTEM = 'You match a person\'s situation to the right helper. Reply with tool ids only.';
+const AI_SEARCH_CACHE = new Map();
+const AI_SEARCH_CACHE_MAX = 40;
+const AI_SEARCH_TIMEOUT_MS = 6000;
+
+function aiSearchPrompt(query) {
+  return (
+    'The person says:\n"' + String(query).trim() + '"\n\n' +
+    'Tools (id — label — description):\n' +
+    AnchorSearch.buildToolCatalogue(TOOLS) + '\n\n' +
+    'Reply with up to 3 tool ids that best fit the person\'s situation, one per line.\n' +
+    'Use ids exactly as listed above. If none fit, reply with: none\n' +
+    'No other text.'
+  );
+}
+
+// Key/base/online check that never throws and never touches the network.
+function aiSearchContext() {
+  const conf = providerConf();
+  const hasKey = conf.needsKey ? !!apiKey() : !!apiBase();
+  const online = typeof navigator === 'undefined' || navigator.onLine !== false;
+  return { hasKey, online, ready: hasKey && online && !!apiBase() };
+}
+
+async function aiSearchIds(query, signal) {
+  const cacheKey = AnchorSearch.aiCacheKey(settings.provider, modelLabel(), query);
+  if (AI_SEARCH_CACHE.has(cacheKey)) return AI_SEARCH_CACHE.get(cacheKey);
+  const text = await chatOnce({
+    system: AI_SEARCH_SYSTEM,
+    user: aiSearchPrompt(query),
+    signal,
+    maxTokens: 40,
+  });
+  const ids = AnchorSearch.parseAiToolIds(text, TOOLS.map((t) => t.id));
+  if (AI_SEARCH_CACHE.size >= AI_SEARCH_CACHE_MAX) {
+    AI_SEARCH_CACHE.delete(AI_SEARCH_CACHE.keys().next().value);
+  }
+  AI_SEARCH_CACHE.set(cacheKey, ids);
+  return ids;
+}
+
+async function runAiSearch(query, keywordCount, resultsEl, listEl, inputEl, abortRef) {
+  const { hasKey, online, ready } = aiSearchContext();
+  if (!ready) return;
+  if (!AnchorSearch.shouldAskAi({
+    query,
+    keywordCount,
+    hasKey,
+    online,
+    catalogueHit: AnchorSearch.hasCatalogueWord(query, AnchorSearch.catalogueWordSet(TOOLS)),
+  })) return;
+
+  // A newer query supersedes the in-flight one.
+  if (abortRef && abortRef.current) abortRef.current.abort();
+  const ac = new AbortController();
+  if (abortRef) abortRef.current = ac;
+  const timeout = setTimeout(() => ac.abort(), AI_SEARCH_TIMEOUT_MS);
+  try {
+    const ids = await aiSearchIds(query, ac.signal);
+    if (ac.signal.aborted) return;
+    if (!inputEl || inputEl.value.trim() !== String(query).trim()) return;
+    const aiTools = ids.map((id) => TOOLS.find((t) => t.id === id)).filter(Boolean);
+    if (!aiTools.length) return;
+    renderFinder(query, resultsEl, listEl, aiTools);
+  } catch {
+    /* no key, offline, timeout or provider error: keyword results stay as-is */
+  } finally {
+    clearTimeout(timeout);
+    if (abortRef && abortRef.current === ac) abortRef.current = null;
+  }
+}
 
 function sortedTools() {
   const favs = (settings.favoriteTools || []).filter((id) => TOOLS.some((t) => t.id === id));
@@ -1735,6 +1797,7 @@ function renderConvList() {
         '<div class="convo-item' + (c.id === currentId ? ' active' : '') + '" data-id="' + c.id + '" role="button" tabindex="0">' +
         '<span class="c-title">' + escapeHtml(c.title || 'Untitled') + '</span>' +
         '<span class="c-date">' + relDate(c.updated || c.created) + '</span>' +
+        '<button type="button" class="c-ren" data-ren="' + c.id + '" aria-label="Rename chat" title="Rename">' + icon('pencil') + '</button>' +
         '<button type="button" class="c-del" data-del="' + c.id + '" aria-label="Delete chat" title="Delete">' + icon('trash') + '</button>' +
         '</div>'
     )
@@ -2100,12 +2163,25 @@ function deleteConvo(id) {
   if (currentId === id) {
     stopSpeaking();
     currentId = null;
+    rememberLast();
     $('#chat-title').textContent = 'New chat';
     renderMessages();
   }
   saveConvos();
   renderConvList();
   toast('Chat deleted');
+}
+
+function renameConvo(id, title) {
+  const name = (title || '').trim();
+  if (!name) return; // never save an empty title
+  const c = convos.find((x) => x.id === id);
+  if (!c) return;
+  c.title = name;
+  c.updated = Date.now(); // dirty-check key for the incremental IndexedDB flush
+  saveConvos();
+  renderConvList();
+  if (id === currentId) $('#chat-title').textContent = c.title || 'Chat';
 }
 
 function ensureConvo() {
@@ -2468,6 +2544,7 @@ function populateSettings() {
   $('#set-mode').value = settings.mode;
   $('#custom-prompt-row').hidden = settings.mode !== 'custom';
   $('#set-customprompt').value = settings.customPrompt;
+  $('#set-masterprompt').value = settings.masterPrompt;
   $('#set-profile').value = settings.profile;
   $('#set-temp').value = settings.temperature;
   $('#temp-val').value = settings.temperature.toFixed(2);
@@ -2603,10 +2680,22 @@ function wire() {
     const clearBtn = wrap.querySelector('.finder-clear');
     const listEl = wrap.dataset.hide ? $(wrap.dataset.hide) : null;
     let deb = null;
+    let aiDeb = null;
+    const abortRef = { current: null };
     input.addEventListener('input', () => {
       clearTimeout(deb);
+      clearTimeout(aiDeb);
+      // a new query supersedes any in-flight AI search
+      if (abortRef.current) { abortRef.current.abort(); abortRef.current = null; }
       clearBtn.hidden = !input.value;
+      // keyword results render first (150 ms) and are never removed
       deb = setTimeout(() => renderFinder(input.value, results, listEl), 150);
+      // sentence-like queries may ask the model after typing stops (450 ms)
+      aiDeb = setTimeout(() => {
+        const q = input.value.trim();
+        if (!q) return;
+        runAiSearch(q, findTools(q).length, results, listEl, input, abortRef);
+      }, 450);
     });
     input.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
@@ -2616,6 +2705,9 @@ function wire() {
       }
     });
     clearBtn.addEventListener('click', () => {
+      clearTimeout(deb);
+      clearTimeout(aiDeb);
+      if (abortRef.current) { abortRef.current.abort(); abortRef.current = null; }
       input.value = '';
       renderFinder('', results, listEl);
       clearBtn.hidden = true;
@@ -2642,6 +2734,9 @@ function wire() {
     }
     const tool = TOOLS.find((t) => t.id === btn.dataset.tool);
     if (!tool) return;
+    // a tool tap starts a fresh chat; do this before writing the template so the
+    // composer is left holding exactly the template (newChat does not clear it)
+    newChat();
     const input = $('#composer-input');
     input.value = tool.template;
     autoGrow(input);
@@ -2653,22 +2748,24 @@ function wire() {
 
   // conversation list
   $('#convo-list').addEventListener('click', (e) => {
+    const ren = e.target.closest('.c-ren');
+    if (ren) {
+      e.stopPropagation();
+      openRenameDialog(ren.dataset.ren);
+      return;
+    }
     const del = e.target.closest('.c-del');
     if (del) {
       e.stopPropagation();
-      if (del.classList.contains('armed')) {
-        deleteConvo(del.dataset.del);
-      } else {
-        del.classList.add('armed');
-        del.title = 'Tap again to really delete';
-        setTimeout(() => del.classList.remove('armed'), 3000);
-      }
+      openDeleteDialog(del.dataset.del);
       return;
     }
     const item = e.target.closest('.convo-item');
     if (item) switchConvo(item.dataset.id);
   });
   $('#convo-list').addEventListener('keydown', (e) => {
+    // row action buttons handle their own Enter/Space activation
+    if (e.target.closest('button')) return;
     if (e.key === 'Enter' || e.key === ' ') {
       const item = e.target.closest('.convo-item');
       if (item) { e.preventDefault(); switchConvo(item.dataset.id); }
@@ -2816,6 +2913,45 @@ function wire() {
     if (passMode === 'setup') updateStrength($('#pass-input').value);
   });
 
+  // rename chat dialog
+  const renameDlg = $('#rename-chat');
+  const renameInput = $('#rename-input');
+  const renameOk = $('#rename-ok');
+  renameOk.addEventListener('click', () => {
+    const name = renameInput.value.trim();
+    if (!name) return; // safety net: never save an empty title
+    renameConvo(renameDlg.dataset.id, name);
+    renameDlg.close();
+  });
+  renameInput.addEventListener('input', () => {
+    renameOk.disabled = !renameInput.value.trim();
+  });
+  renameInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); renameOk.click(); }
+  });
+  $('#rename-cancel').addEventListener('click', () => renameDlg.close());
+  $('#close-rename').addEventListener('click', () => renameDlg.close());
+  // Escape closes natively; a click on the backdrop targets the dialog itself
+  renameDlg.addEventListener('click', (e) => {
+    if (e.target === renameDlg) renameDlg.close();
+  });
+
+  // delete chat dialog (explicit confirmation, one tap to open + one to confirm)
+  const deleteDlg = $('#delete-chat');
+  const deleteOk = $('#delete-ok');
+  deleteOk.addEventListener('click', () => {
+    const id = deleteDlg.dataset.id;
+    deleteDlg.close();
+    if (id) deleteConvo(id);
+  });
+  $('#delete-cancel').addEventListener('click', () => deleteDlg.close());
+  $('#close-delete').addEventListener('click', () => deleteDlg.close());
+  deleteDlg.addEventListener('click', (e) => {
+    if (e.target === deleteDlg) deleteDlg.close();
+  });
+  // Escape closes natively via the dialog's cancel event; clear the id either way
+  deleteDlg.addEventListener('close', () => { delete deleteDlg.dataset.id; });
+
   // settings dialog
   $('#close-settings').addEventListener('click', closeSettings);
   document.querySelectorAll('.tab-btn').forEach((b) => {
@@ -2882,6 +3018,10 @@ function wire() {
   });
   $('#set-customprompt').addEventListener('input', () => {
     settings.customPrompt = $('#set-customprompt').value;
+    saveSettings();
+  });
+  $('#set-masterprompt').addEventListener('input', () => {
+    settings.masterPrompt = $('#set-masterprompt').value;
     saveSettings();
   });
   $('#set-profile').addEventListener('input', () => {
