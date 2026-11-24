@@ -25,13 +25,16 @@ const sha8 = (buf) => createHash('sha256').update(buf).digest('hex').slice(0, 8)
 
 // --- read sources ---
 const appJs = readFileSync(join(SRC, 'app.js'));
+const searchCoreJs = readFileSync(join(SRC, 'search-core.js'));
 const stylesCss = readFileSync(join(SRC, 'styles.css'));
 const indexHtml = readFileSync(join(SRC, 'index.html'), 'utf8');
 const swSrc = readFileSync(join(SRC, 'sw.js'), 'utf8');
 
 const appHash = sha8(appJs);
+const searchHash = sha8(searchCoreJs);
 const stylesHash = sha8(stylesCss);
 const APP = `assets/app.${appHash}.js`;
+const SEARCH = `assets/search-core.${searchHash}.js`;
 const STYLES = `assets/styles.${stylesHash}.css`;
 
 // --- clean output ---
@@ -40,21 +43,26 @@ mkdirSync(join(DIST, 'assets'), { recursive: true });
 
 // --- hashed assets ---
 writeFileSync(join(DIST, APP), appJs);
+writeFileSync(join(DIST, SEARCH), searchCoreJs);
 writeFileSync(join(DIST, STYLES), stylesCss);
 
 // --- index.html with hashed references ---
 let html = indexHtml
   .replace('href="styles.css"', `href="${STYLES}"`)
+  .replace('src="search-core.js"', `src="${SEARCH}"`)
   .replace('src="app.js"', `src="${APP}"`);
 if (html === indexHtml) throw new Error('build: index.html no longer references styles.css / app.js — update build.mjs');
 writeFileSync(join(DIST, 'index.html'), html);
 
 // --- sw.js: version + assets derived from content hashes ---
 let sw = swSrc
-  .replace(/const CACHE = '[^']*';/, `const CACHE = 'anchor-${appHash}${stylesHash.slice(0, 4)}';`)
+  .replace(/const CACHE = '[^']*';/, `const CACHE = 'anchor-${appHash}${searchHash.slice(0, 4)}${stylesHash.slice(0, 4)}';`)
+  .replace("'./search-core.js'", `'./${SEARCH}'`)
   .replace("'./app.js'", `'./${APP}'`)
   .replace("'./styles.css'", `'./${STYLES}'`);
-if (!sw.includes(APP) || !sw.includes(STYLES)) throw new Error('build: sw.js patch failed — update build.mjs');
+if (!sw.includes(APP) || !sw.includes(SEARCH) || !sw.includes(STYLES)) {
+  throw new Error('build: sw.js patch failed — update build.mjs');
+}
 writeFileSync(join(DIST, 'sw.js'), sw);
 
 // --- static files, copied as-is ---
@@ -101,5 +109,6 @@ writeFileSync(join(DIST, '_headers'), HEADERS);
 
 console.log('built dist/');
 console.log('  app     →', APP);
+console.log('  search  →', SEARCH);
 console.log('  styles  →', STYLES);
 if (existsSync(join(DIST, '_headers'))) console.log('  headers  _headers (immutable assets, fresh HTML, no-store sw.js)');

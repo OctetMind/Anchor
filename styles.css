@@ -259,6 +259,10 @@ html[data-motion="reduce"] .acc-head .chev { transition: none; }
 .finder-results { display: flex; flex-direction: column; gap: 6px; }
 .finder-why { font-size: 0.72rem; color: var(--text-dim); padding: 0 10px 6px; margin-top: -4px; }
 .finder-msg { font-size: 0.85rem; color: var(--text-dim); padding: 6px 8px; }
+/* AI picks: a clearly separate group above the keyword results */
+.finder-group { display: flex; flex-direction: column; gap: 6px; padding-bottom: 6px; }
+.finder-group-title { margin: 0; padding: 0 10px; font-size: 0.72rem; font-weight: 600; color: var(--text-dim); }
+.finder-guess { font-weight: 400; opacity: 0.7; }
 
 #convo-list { display: flex; flex-direction: column; gap: 4px; }
 
@@ -281,16 +285,21 @@ html[data-motion="reduce"] .acc-head .chev { transition: none; }
   font-size: 0.92rem;
 }
 .convo-item .c-date { font-size: 0.72rem; color: var(--text-dim); flex: none; }
-.convo-item .c-del {
+.convo-item .c-del,
+.convo-item .c-ren {
   width: 34px; height: 34px;
   border-radius: 8px;
   display: inline-flex; align-items: center; justify-content: center;
   color: var(--text-dim);
   opacity: 0;
 }
-.convo-item:hover .c-del, .convo-item .c-del:focus-visible { opacity: 1; }
+.convo-item:hover .c-del, .convo-item .c-del:focus-visible,
+.convo-item:hover .c-ren, .convo-item .c-ren:focus-visible { opacity: 1; }
 .convo-item .c-del:hover { color: var(--danger); background: var(--bg); }
-.convo-item .c-del.armed { opacity: 1; color: var(--danger); }
+.convo-item .c-ren:hover { color: var(--text); background: var(--bg); }
+@media (pointer: coarse) {
+  .convo-item .c-del, .convo-item .c-ren { opacity: 0.55; }
+}
 
 .side-foot {
   margin-top: auto;
@@ -759,6 +768,23 @@ kbd {
 .pass-meter-fill.strong { background: var(--accent-strong); }
 html[data-theme="light"] .pass-meter-fill.ok { background: #a9863f; }
 html[data-motion="reduce"] .pass-meter-fill { transition: none; }
+
+/* ---------- rename chat dialog ---------- */
+
+#rename-chat {
+  width: min(430px, 92vw);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--bg-raised);
+  color: var(--text);
+  padding: 0;
+}
+#rename-chat::backdrop { background: rgba(0, 0, 0, 0.55); backdrop-filter: blur(2px); }
+
+.rename-body { padding: 18px 20px 22px; }
+.rename-body .row { margin-bottom: 14px; }
+.rename-body .row:last-of-type { margin-bottom: 0; }
+.rename-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
 
 .key-locked { display: flex; }
 .key-locked .btn-ghost { width: 100%; }

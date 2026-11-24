@@ -201,7 +201,7 @@
           Unlock — enter your passphrase
         </button>
       </div>
-      <p class="hint">Get one at platform.openai.com, console.anthropic.com, aistudio.google.com, openrouter.ai or groq.com. Free options exist (Gemini, Groq, OpenRouter free models).</p>
+      <p class="hint">Get one at platform.openai.com, console.anthropic.com, aistudio.google.com, openrouter.ai, requesty.ai or groq.com. Free options exist (Gemini, Groq, OpenRouter free models).</p>
     </div>
     <div class="row check-row" id="encrypt-row">
       <label><input id="set-encrypt" type="checkbox"> Lock my API key with a passphrase <span class="opt">(encrypted on this device)</span></label>
@@ -236,6 +236,11 @@
     <div class="row" id="custom-prompt-row" hidden>
       <label for="set-customprompt">Custom instructions for the AI</label>
       <textarea id="set-customprompt" rows="5" placeholder="e.g. Always answer in bullet points. Never mention food. I'm a nurse; explain medical things at that level."></textarea>
+    </div>
+    <div class="row">
+      <label for="set-masterprompt">Master instructions <span class="opt">(always apply)</span></label>
+      <textarea id="set-masterprompt" rows="4" placeholder="e.g. When I ask for help starting something, give me the steps to start — not a code script."></textarea>
+      <p class="hint">Standing rules for how Anchor should help you. These apply to every answer and every tool. Example: “When I ask for help starting something, give me the steps to start — no code, no essay.”</p>
     </div>
     <div class="row">
       <label for="set-profile">About you <span class="opt">(optional, always included)</span></label>
@@ -435,9 +440,45 @@
   </div>
 </dialog>
 
+<dialog id="rename-chat" aria-labelledby="rename-title">
+  <div class="dlg-head">
+    <h2 id="rename-title">Rename chat</h2>
+    <button id="close-rename" class="icon-btn" type="button" aria-label="Close" title="Close">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="rename-body">
+    <div class="row">
+      <label for="rename-input">Chat name</label>
+      <input id="rename-input" type="text" autocomplete="off" spellcheck="false">
+    </div>
+    <div class="rename-actions">
+      <button type="button" id="rename-cancel" class="btn-ghost">Cancel</button>
+      <button type="button" id="rename-ok" class="btn-primary">Save</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="delete-chat" aria-labelledby="delete-title" aria-describedby="delete-desc">
+  <div class="dlg-head">
+    <h2 id="delete-title">Delete chat?</h2>
+    <button id="close-delete" class="icon-btn" type="button" aria-label="Close" title="Close">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="rename-body">
+    <p class="hint" id="delete-desc">“<span id="delete-chat-name"></span>” will be permanently removed from this device.</p>
+    <div class="rename-actions">
+      <button type="button" id="delete-cancel" data-cancel class="btn-ghost">Cancel</button>
+      <button type="button" id="delete-ok" data-confirm class="btn-danger">Delete</button>
+    </div>
+  </div>
+</dialog>
+
 <div id="toast" role="status" aria-live="polite"></div>
 
 <noscript><div style="padding:2rem;font-family:system-ui">Anchor needs JavaScript to run — it's a local app with no server.</div></noscript>
+<script type="module" src="search-core.js"></script>
 <script src="app.js" defer></script>
 </body>
 </html>

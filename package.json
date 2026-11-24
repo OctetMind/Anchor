@@ -5,7 +5,10 @@
   "scripts": {
     "build": "node build.mjs",
     "deploy": "node build.mjs && wrangler deploy",
-    "dev": "python3 -m http.server 8000"
+    "dev": "python3 -m http.server 8000",
+    "test:delete": "node scripts/delete-chat.e2e.mjs",
+    "test:search": "node scripts/search-core.test.mjs",
+    "test:finder": "node scripts/finder.e2e.mjs"
   },
   "devDependencies": {
     "wrangler": "^4.164.0"
